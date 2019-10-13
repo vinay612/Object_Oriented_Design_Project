@@ -12,7 +12,6 @@ import java.io.IOException;
 
 public class GraphGUI {
 
-    private static final String filePath = "obj.bin";
     public static int Red = 0;
     public static int Blue = 0;
     public static int Green = 0;
@@ -115,6 +114,10 @@ public class GraphGUI {
         MenuItem resetButton = new MenuItem("Reset");
         panel1.add(resetButton);
         resetButton.addActionListener(new ResetListener());
+
+        MenuItem blossom= new MenuItem("Maximum Matching");
+        panel1.add(blossom);
+        blossom.addActionListener(new EdmondBlossomMaxMatchListener());
         
 
         Menu panel2 = new Menu("File");
@@ -168,6 +171,7 @@ public class GraphGUI {
                 FileWriter fout = new FileWriter(filename);
 
                 fout.write(graph.getGraph().numNodes() + "\n");
+                fout.write(graph.getGraph().numEdges() + "\n");
 
                 for (int i = 0; i < graph.getGraph().numNodes(); i++) {
                     Graph<DisplayNode, DisplayEdge>.Node node = graph.getGraph().getNode(i);
@@ -178,7 +182,6 @@ public class GraphGUI {
                             + "\n");
                 }
 
-                fout.write(graph.getGraph().numEdges() + "\n");
 
                 for (int i = 0; i < graph.getGraph().numEdges(); i++) {
                     Graph<DisplayNode, DisplayEdge>.Edge edge = graph.getGraph().getEdge(i);
@@ -231,12 +234,12 @@ public class GraphGUI {
                 FileReader fr = new FileReader(filepath); 
                 BufferedReader br = new BufferedReader(fr);
                 int numNodes = Integer.parseInt(br.readLine());
+                int numEdges = Integer.parseInt(br.readLine());
                 for(int i = 0; i < numNodes; i++){
                     String[] arrSplit = br.readLine().split(",");
                     Point newPoint = new Point(Integer.parseInt(arrSplit[0]), Integer.parseInt(arrSplit[1]));
                     graph.getGraph().addNode(new DisplayNode(newPoint, arrSplit[2], new Color(Integer.parseInt(arrSplit[3]), Integer.parseInt(arrSplit[4]), Integer.parseInt(arrSplit[5]))));
                 }
-                int numEdges = Integer.parseInt(br.readLine());
                 for(int i = 0; i < numEdges; i++){
                     String[] arrSplit = br.readLine().split(",");
                     graph.getGraph().addEdge(new DisplayEdge(arrSplit[2], new Color(Integer.parseInt(arrSplit[3]), Integer.parseInt(arrSplit[4]), Integer.parseInt(arrSplit[5])), 0), graph.getGraph().getNode(Integer.parseInt(arrSplit[0])), graph.getGraph().getNode(Integer.parseInt(arrSplit[1])));
@@ -362,6 +365,23 @@ public class GraphGUI {
         }
     }
 
+
+    private class EdmondBlossomMaxMatchListener implements ActionListener{
+        public void actionPerformed(ActionEvent e)
+        {
+            String filepath;
+            JFileChooser fc=new JFileChooser();    
+            int j=fc.showOpenDialog(null);       
+            File f=fc.getSelectedFile();    
+            filepath=f.getPath(); 
+            EdmondBlossomMaxMatch.main(filepath);
+        }
+
+    }
+
+
+
+
     /** Mouse listener for Pointgraph element */
     private class PointMouseListener extends MouseAdapter
         implements MouseMotionListener {
@@ -377,7 +397,7 @@ public class GraphGUI {
                 // Otherwise, emit a beep, as shown below:
                 if(nearBy == null) {
                     Point newPoint = new Point(mouseX, mouseY);
-                    String data = JOptionPane.showInputDialog("Please input data for node: ");
+                    String data = JOptionPane.showInputDialog("Please input name for node(In Integer): ");
                     if (data != null) {
                         graph.getGraph().addNode(new DisplayNode(newPoint, data, new Color(Red, Blue, Green)));
                     }
